@@ -14,6 +14,7 @@ The MVP includes the required workflow, financial controls, role-based access, a
 - Authentication: JWT
 - AI: OpenAI-compatible API
 - Local database: Docker Compose
+- Bonus: lightweight AI chat widget
 
 ## Versions to use
 
@@ -185,21 +186,22 @@ The production build should complete without errors.
 7. Enter an Admin override reason and close it.
 8. Confirm the override is recorded in the Activity Timeline.
 9. Return to Dashboard and confirm the counts update.
-10. Use **Ask My Business** with: `Show me projects for Acme Trading with margins below 20%.`
-11. Generate a **Daily Brief**.
-12. Generate a **Follow-up Email** for a project.
-13. Edit the draft and use **Edit & Confirm**.
-14. Confirm the approved AI draft appears in the Activity Timeline.
-15. Toggle Light/Dark mode and refresh the page.
-16. Log in as **Sales** and confirm supplier costs and profit/margin are hidden.
-17. Log in as **Procurement** and confirm customer revenue/balance and profit/margin are hidden.
-18. As **Sales**, ask AI for supplier costs, expenses, profit, or margin; it must refuse the restricted request.
-19. As **Procurement**, ask AI for customer revenue, customer balance, profit, or margin; it must refuse the restricted request.
-20. Generate a Daily Brief as Sales and Procurement and verify it contains only information allowed for that role.
+10. Use the **Ask My Business** chat with: `Show me projects for Acme Trading with margins below 20%.`
+11. Ask a follow-up question in the same chat to demonstrate the lightweight chat experience.
+12. Generate a **Daily Brief**.
+13. Generate a **Follow-up Email** for a project.
+14. Edit the draft and use **Edit & Confirm**.
+15. Confirm the approved AI draft appears in the Activity Timeline.
+17. Toggle Light/Dark mode and refresh the page.
+18. Log in as **Sales** and confirm supplier costs and profit/margin are hidden.
+19. Log in as **Procurement** and confirm customer revenue/balance and profit/margin are hidden.
+20. As **Sales**, ask AI for supplier costs, expenses, profit, or margin; it must refuse the restricted request.
+21. As **Procurement**, ask AI for customer revenue, customer balance, profit, or margin; it must refuse the restricted request.
+22. Generate a Daily Brief as Sales and Procurement and verify it contains only information allowed for that role.
 
 ## Required demo walkthrough
 
-The following is the recommended submission walkthrough:
+The assignment allows a video **or** a bulleted demo. The following is the recommended submission walkthrough:
 
 - **Create RFQ:** create a new project from the Projects page.
 - **Quote:** move the project from `RFQ` to `Quoted`.
@@ -215,6 +217,11 @@ The following is the recommended submission walkthrough:
 - **AI Follow-Up:** generate a customer follow-up draft for a project.
 - **Human Approval:** edit the AI draft and explicitly confirm it before it is recorded.
 - **API Documentation:** open `/docs` to demonstrate the REST API.
+
+## Bonus features
+
+### AI chat widget
+The Dashboard includes a lightweight chat-style interface built on the existing `/api/ai/ask` endpoint. Each message still uses the same database-grounded, role-filtered backend context and no new AI data source is introduced.
 
 ## Core business rules
 
