@@ -24,8 +24,6 @@ Use these versions for the setup below:
 - **Node.js 20 LTS (20.x)**
 - **Docker Desktop** with Docker Compose
 
-Do not use Python 3.14 for this submission.
-
 ## New setup from scratch
 
 Follow these steps on a fresh checkout. No migration or upgrade steps are required.
@@ -87,6 +85,8 @@ OPENAI_MODEL=gpt-5.6-luna
 The non-AI application works without an API key. The AI features require a valid API key with API access. OpenAI currently lists `gpt-5.6-luna` as a cost-sensitive model available through its API. citeturn868178search0
 
 You can also point these settings at another OpenAI-compatible provider by changing `OPENAI_BASE_URL` and `OPENAI_MODEL`.
+
+Note: openrouter/free was used in the testing phase, as I had no access to an openai api.
 
 ### 4. Verify the backend
 
@@ -291,9 +291,7 @@ Restricted financial fields are omitted from role-filtered API responses and AI 
 - `POST /api/ai/draft-followup/{project_id}`
 - `POST /api/ai/confirm-draft/{project_id}`
 
-## Notes for a fresh submission
-
-- `.env` and `.env.local` are ignored by Git.
-- Commit only the example environment files.
-- The seeded database contains four demo projects and three demo users.
-- The project intentionally uses SQLAlchemy table creation instead of a migration framework because this is a compact MVP coding-test submission.
+## Final Notes
+- AI was used as an assistant in creating, reviewing and testing features of this project.
+- The project was kept simple. I prioritized a functional and clean app over a complicated and non-functional alternative.
+- AI-Widget added from the bonuses section.
