@@ -112,7 +112,11 @@ export default function Dashboard() {
               <div className="small">
                 {p.due_date && p.due_date < new Date().toISOString().slice(0, 10) ? <span className="badge red">Overdue</span> : null}{" "}
                 {!p.next_action ? <span className="badge orange">Missing next action</span> : null}{" "}
-                {p.margin_percent != null && p.margin_percent < 20 && p.margin_percent > 0 ? <span className="badge red">Margin {Number(p.margin_percent).toFixed(1)}%</span> : null}{" "}
+                {p.margin_percent != null && p.margin_percent < 20 ? (
+                  <span className="badge red">
+                    Margin {Number(p.margin_percent).toFixed(1)}%
+                  </span>
+                ) : null}
                 {p.hold ? <span className="badge red">Payment hold</span> : null}
               </div>
             </Link>
