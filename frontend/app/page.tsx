@@ -8,12 +8,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("mbm_token");
-
-    if (token) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
+    router.replace(token ? "/dashboard" : "/login");
   }, [router]);
 
   return (

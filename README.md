@@ -18,11 +18,11 @@ The MVP includes the required workflow, financial controls, role-based access, a
 
 ## Versions to use
 
-Use these versions for the setup below:
-
 - **Python 3.12.x**
 - **Node.js 20 LTS (20.x)**
 - **Docker Desktop** with Docker Compose
+
+Do not use Python 3.14 for this submission environment.
 
 ## New setup from scratch
 
@@ -36,11 +36,9 @@ From the repository root:
 docker compose up -d postgres
 ```
 
-The included Compose file creates a PostgreSQL 17 database named `master_business` with the credentials already expected by the backend.
+The included Compose file creates the PostgreSQL database expected by the backend.
 
 ### 2. Set up the backend
-
-Open a terminal in the repository root.
 
 #### Windows PowerShell
 
@@ -68,34 +66,33 @@ python seed.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-The seed script waits for PostgreSQL to become available before creating the tables and demo data, so you do not need to manually time the database startup.
-
-The backend automatically loads `backend/.env`, regardless of the directory from which the backend process is started.
+The seed script waits for PostgreSQL to become available before creating tables and demo data.
 
 ### 3. Configure AI
 
-Open `backend/.env` and set your OpenAI API key:
+Open `backend/.env` and set your provider configuration:
 
 ```env
-OPENAI_API_KEY=your-openai-api-key
+OPENAI_API_KEY=your-api-key
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-5.6-luna
 ```
 
-The non-AI application works without an API key. The AI features require a valid API key with API access. OpenAI currently lists `gpt-5.6-luna` as a cost-sensitive model available through its API. citeturn868178search0
+The non-AI application works without an API key. AI features require a valid provider key.
 
-You can also point these settings at another OpenAI-compatible provider by changing `OPENAI_BASE_URL` and `OPENAI_MODEL`.
+The integration uses the standard OpenAI Python client, so another OpenAI-compatible provider can be used by changing only `OPENAI_BASE_URL` and `OPENAI_MODEL`.
 
-Note: openrouter/free was used in the testing phase, as I had no access to an openai api.
+Note: openrouter/free was used in the testing of this project, no open AI api was available at time of testing. 
+Additionally, if it says api key not found, rerun and should work fine. (docker compose down -v, docker compose up -d postgres, python seed.py)
 
 ### 4. Verify the backend
 
-With the backend still running, open:
+Open:
 
 - `http://localhost:8000/health`
 - `http://localhost:8000/docs`
 
-The health endpoint should return:
+The health endpoint should return HTTP 200:
 
 ```json
 {"status":"ok","database":"ok"}
@@ -103,14 +100,14 @@ The health endpoint should return:
 
 ### 5. Set up the frontend
 
-Open a **second terminal** from the repository root.
+Open a second terminal:
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create the frontend environment file.
+Create `.env.local` from `.env.local.example`.
 
 #### Windows PowerShell
 
@@ -146,13 +143,11 @@ Open `http://localhost:3000`.
 | Sales | `sales@example.com` | `sales123` |
 | Procurement | `procurement@example.com` | `proc123` |
 
-These credentials are demo-only.
-
 ## Verification procedure
 
 ### Backend checks
 
-From `backend`, with the virtual environment active:
+From `backend` with the virtual environment active:
 
 ```bash
 pytest -q
@@ -173,35 +168,33 @@ From `frontend`:
 npm run build
 ```
 
-The production build should complete without errors.
-
 ### Manual application check
 
 1. Log in as **Admin**.
 2. Confirm the Dashboard loads without errors.
 3. Open **Projects** and confirm the four seeded projects are visible.
 4. Open **Northstar Store Rollout** and move `Quoted → Ordered`.
-5. Open **Acme Spare Parts** and confirm its `Shipping` status and shipment hold.
+5. Open **Acme Spare Parts** and confirm `Shipping` status and shipment hold.
 6. Try to close it without an override reason; the backend must reject it.
 7. Enter an Admin override reason and close it.
 8. Confirm the override is recorded in the Activity Timeline.
 9. Return to Dashboard and confirm the counts update.
 10. Use the **Ask My Business** chat with: `Show me projects for Acme Trading with margins below 20%.`
-11. Ask a follow-up question in the same chat to demonstrate the lightweight chat experience.
+11. Ask a follow-up question in the same chat.
 12. Generate a **Daily Brief**.
 13. Generate a **Follow-up Email** for a project.
 14. Edit the draft and use **Edit & Confirm**.
 15. Confirm the approved AI draft appears in the Activity Timeline.
-17. Toggle Light/Dark mode and refresh the page.
-18. Log in as **Sales** and confirm supplier costs and profit/margin are hidden.
-19. Log in as **Procurement** and confirm customer revenue/balance and profit/margin are hidden.
-20. As **Sales**, ask AI for supplier costs, expenses, profit, or margin; it must refuse the restricted request.
-21. As **Procurement**, ask AI for customer revenue, customer balance, profit, or margin; it must refuse the restricted request.
-22. Generate a Daily Brief as Sales and Procurement and verify it contains only information allowed for that role.
+16. Toggle Light/Dark mode and refresh the page.
+17. Log in as **Sales** and confirm supplier costs and profit/margin are hidden.
+18. Log in as **Procurement** and confirm customer revenue/balance and profit/margin are hidden.
+19. As **Sales**, ask AI for supplier costs, expenses, profit, or margin; it must refuse the restricted request.
+20. As **Procurement**, ask AI for customer revenue, customer balance, profit, or margin; it must refuse the restricted request.
+21. Generate a Daily Brief as Sales and Procurement and verify it contains only information allowed for that role.
 
 ## Required demo walkthrough
 
-The assignment allows a video **or** a bulleted demo. The following is the recommended submission walkthrough:
+The assignment allows a video **or** a bulleted demo. Use the following walkthrough in the submission:
 
 - **Create RFQ:** create a new project from the Projects page.
 - **Quote:** move the project from `RFQ` to `Quoted`.
@@ -211,17 +204,46 @@ The assignment allows a video **or** a bulleted demo. The following is the recom
 - **Shipment Hold:** show that a shipping project with an outstanding customer balance cannot be closed normally.
 - **Admin Override:** enter a reason and show the override in the Activity Timeline.
 - **Dashboard Attention:** show overdue work, missing next actions, low-margin Admin alerts, and shipment holds.
-- **Role-Based Access:** show the different financial visibility for Admin, Sales, and Procurement.
+- **Role-Based Access:** show different financial visibility for Admin, Sales, and Procurement.
 - **Ask My Business:** ask a database-grounded question about projects or margins.
-- **Daily Brief:** generate the day's attention summary.
+- **Daily Brief:** generate the current attention summary.
 - **AI Follow-Up:** generate a customer follow-up draft for a project.
 - **Human Approval:** edit the AI draft and explicitly confirm it before it is recorded.
 - **API Documentation:** open `/docs` to demonstrate the REST API.
+- **AI Chat Bonus:** ask multiple questions in the dashboard chat widget.
 
-## Bonus features
+## Architecture
 
-### AI chat widget
-The Dashboard includes a lightweight chat-style interface built on the existing `/api/ai/ask` endpoint. Each message still uses the same database-grounded, role-filtered backend context and no new AI data source is introduced.
+```text
+master-business-management-app/
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── auth_routes.py
+│   │   │   ├── master_data_routes.py
+│   │   │   ├── project_routes.py
+│   │   │   ├── dashboard_routes.py
+│   │   │   ├── ai_routes.py
+│   │   │   └── routes.py
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   └── services/
+│   │       ├── ai_service.py
+│   │       └── project_service.py
+│   ├── seed.py
+│   ├── tests.py
+│   └── requirements.txt
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   └── lib/
+├── docker-compose.yml
+└── README.md
+```
+
+The API is intentionally split by responsibility while preserving one `/api` entry point. Business rules remain in services; route modules handle HTTP concerns; SQLAlchemy models represent the relational data.
 
 ## Core business rules
 
@@ -257,7 +279,7 @@ When a project is in `Shipping` and `Customer Balance Due > 0`:
 ### Permissions
 
 | Capability | Admin | Sales | Procurement |
-|---|---:|---:|---:|
+|---|:---:|:---:|:---:|
 | Customers | ✓ | ✓ | ✓ |
 | Suppliers | ✓ | — | ✓ |
 | Customer revenue | ✓ | ✓ | — |
@@ -268,6 +290,20 @@ When a project is in `Shipping` and `Customer Balance Due > 0`:
 | Shipment-hold override | ✓ | — | — |
 
 Restricted financial fields are omitted from role-filtered API responses and AI context.
+
+## Ask My Business AI
+
+The AI retrieves current project data from PostgreSQL and applies role-based filtering before the model is called. Closed projects are excluded from current business-query context.
+
+Supported capabilities:
+
+1. Daily Brief
+2. Natural-language business questions
+3. Project-specific follow-up email drafts
+4. Human approval before an AI draft becomes an activity
+5. Dashboard AI chat widget
+
+The AI is instructed to use the supplied business context only, never invent business facts, use the current date for due-date interpretation, and avoid Markdown tables in favor of concise headings and bullets.
 
 ## API routes
 
@@ -292,6 +328,6 @@ Restricted financial fields are omitted from role-filtered API responses and AI 
 - `POST /api/ai/confirm-draft/{project_id}`
 
 ## Final Notes
-- AI was used as an assistant in creating, reviewing and testing features of this project.
-- The project was kept simple. I prioritized a functional and clean app over a complicated and non-functional alternative.
-- AI-Widget added from the bonuses section.
+- AI was used in the development of this project for adjustments, code reviews, and bug fixes.
+- Prioritized simplicity and functionality over adding too many features.
+- Only AI Widget was implemented from bonus section.
