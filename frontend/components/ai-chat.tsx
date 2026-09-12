@@ -5,9 +5,25 @@ import { api } from "@/lib/api";
 
 type Message = { role: "user" | "assistant"; content: string };
 
+function renderMessage(content: string) {
+  const parts = content.split(/(\*\*.*?\*\*)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export function AIChat() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Ask about projects, customers, status, or other business data available to your role." },
+    {
+      role: "assistant",
+      content:
+        "Ask about projects, customers, status, or other business data available to your role.",
+    },
   ]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +36,10 @@ export function AIChat() {
 
     setError("");
     setQuestion("");
-    setMessages((current) => [...current, { role: "user", content: text }]);
+    setMessages((current) => [
+      ...current,
+      { role: "user", content: text },
+    ]);
     setLoading(true);
 
     try {
@@ -28,7 +47,11 @@ export function AIChat() {
         method: "POST",
         body: JSON.stringify({ message: text }),
       });
-      setMessages((current) => [...current, { role: "assistant", content: result.answer }]);
+
+      setMessages((current) => [
+        ...current,
+        { role: "assistant", content: result.answer },
+      ]);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -40,17 +63,34 @@ export function AIChat() {
     <div className="card stack">
       <div>
         <h2>Ask My Business</h2>
-        <p className="muted small">Database-grounded and filtered by your role.</p>
+        <p className="muted small">
+          Database-grounded and filtered by your role.
+        </p>
       </div>
+
       <div className="chat-window">
         {messages.map((message, index) => (
-          <div key={`${message.role}-${index}`} className={`chat-message ${message.role}`}>
-            <strong>{message.role === "user" ? "You" : "Business AI"}</strong>
-            <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div>
+          <div
+            key={`${message.role}-${index}`}
+            className={`chat-message ${message.role}`}
+          >
+            <strong>
+              {message.role === "user" ? "You" : "Business AI"}
+            </strong>
+
+            <div style={{ whiteSpace: "pre-wrap" }}>
+              {renderMessage(message.content)}
+            </div>
           </div>
         ))}
-        {loading && <div className="chat-message assistant muted">Thinking…</div>}
+
+        {loading && (
+          <div className="chat-message assistant muted">
+            Thinking…
+          </div>
+        )}
       </div>
+
       <form className="stack" onSubmit={send}>
         <textarea
           className="input textarea chat-input"
@@ -59,10 +99,15 @@ export function AIChat() {
           placeholder="e.g. Show me overdue projects"
           disabled={loading}
         />
-        <button className="btn btn-lg" disabled={loading || !question.trim()}>
+
+        <button
+          className="btn btn-lg"
+          disabled={loading || !question.trim()}
+        >
           {loading ? "Asking…" : "Ask Business"}
         </button>
       </form>
+
       {error && <div className="error">{error}</div>}
     </div>
   );
