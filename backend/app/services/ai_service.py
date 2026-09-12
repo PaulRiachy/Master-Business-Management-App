@@ -1,5 +1,6 @@
 from datetime import date
 import json
+import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -22,6 +23,11 @@ def client():
         api_key=settings.openai_api_key,
         base_url=settings.openai_base_url,
     )
+
+
+def _remove_bold_markdown(text: str) -> str:
+    """Remove Markdown bold markers from plain-text AI outputs."""
+    return re.sub(r"\*\*(.*?)\*\*", r"\1", text)
 
 
 def visible_project_data(
@@ -237,11 +243,12 @@ Do not invent anything.
 Formatting rules:
 - Be concise and easy to scan.
 - NEVER use Markdown tables.
-- Use a short heading if useful.
+- NEVER use Markdown bold.
+- NEVER use asterisks for formatting.
+- Use a short plain-text heading if useful.
 - Use bullet points.
 - Give each project its own bullet.
 - Clearly state why each project requires attention.
-- Use **bold** for project names.
 - Do not include closed projects.
 - Do not describe a past due date as future.
 - Do not mention information outside the supplied context.
@@ -259,7 +266,12 @@ ATTENTION DATA:
         ],
     )
 
-    return response.choices[0].message.content or "Attention items are available on the dashboard."
+    content = (
+        response.choices[0].message.content
+        or "Attention items are available on the dashboard."
+    )
+
+    return _remove_bold_markdown(content)
 
 
 def draft_followup(
@@ -277,6 +289,14 @@ Do not send it.
 Include a subject line and body.
 If a fact is missing, phrase it without inventing details.
 Do not use information restricted for the user's role.
+
+Formatting rules:
+- Use plain text only.
+- Do not use Markdown.
+- Do not use Markdown tables.
+- Do not use bold formatting.
+- Do not use asterisks for formatting.
+- Keep the subject and body easy to copy into an email.
 """
 
     response = client().chat.completions.create(
@@ -294,4 +314,9 @@ Do not use information restricted for the user's role.
         ],
     )
 
-    return response.choices[0].message.content or "Unable to draft email."
+    content = (
+        response.choices[0].message.content
+        or "Unable to draft email."
+    )
+
+    return _remove_bold_markdown(content)
